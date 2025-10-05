@@ -432,6 +432,77 @@ def Add():
     except Exception as e:
         print(f"Unexpected error: {e}")
 
+# ================= Update =================
+def Update():
+    try:
+        cars = load_all()
+        car_id = input("Enter CarID to update: ").strip().upper()
+        found = False
+        for car in cars:
+            if car["car_id"] == car_id:
+                found = True
+                print(f"Updating {car_id}...")
+                if car["status"].lower() == "no":
+                    print("Currently not sold → mark SOLD")
+                    car["status"] = "Yes"
+                    while True:
+                        try:
+                            final_price = float(input("Final Price: "))
+                            if final_price < 0:
+                                print("Error: Final Price cannot be negative!")
+                                continue
+                            car["final_price"] = final_price
+                            break
+                        except ValueError:
+                            print("Error: Final Price must be a number!")
+                    while True:
+                        cname = input("Customer Name: ").strip()
+                        if cname == "":
+                            print("Error: Customer Name cannot be empty!")
+                            continue
+                        car["customer_name"] = cname
+                        break
+                    while True:
+                        cphone = input("Customer Phone: ").strip()
+                        if not cphone.isdigit():
+                            print("Error: Phone must contain digits only!")
+                            continue
+                        if len(cphone) < 8 or len(cphone) > 15:
+                            print("Error: Phone length must be 8–15 digits!")
+                            continue
+                        car["customer_phone"] = cphone
+                        break
+                else:
+                    print("Already sold → update details")
+                    new_price = input("New Final Price (blank=keep): ").strip()
+                    if new_price:
+                        try:
+                            final_price = float(new_price)
+                            if final_price < 0:
+                                print("Error: Final Price cannot be negative!.")
+                            else:
+                                car["final_price"] = final_price
+                        except ValueError:
+                            print("Error: Invalid number!.")
+                    new_name = input("New Customer Name (blank=keep): ").strip()
+                    if new_name:
+                        car["customer_name"] = new_name
+                    new_phone = input("New Customer Phone (blank=keep): ").strip()
+                    if new_phone:
+                        if new_phone.isdigit() and 8 <= len(new_phone) <= 15:
+                            car["customer_phone"] = new_phone
+                        else:
+                            print("Error: Invalid phone number!.")
+                car["profit"] = car["final_price"] - car["buy_price"]
+                break
+        if not found:
+            print("CarID not found!")
+            return
+        save_all(cars)
+        print("Car updated successfully!")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
 # ================= Delete =================
 def Delete():
     cars = load_all()
